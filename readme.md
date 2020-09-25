@@ -3,10 +3,10 @@
 This repository contains the following projects:
 
 * OpenSubtitlesLibrary\
-  This is a .Net Core client library implementation for the [v1 REST API](https://www.opensubtitles.com/docs/api/html/index.htm) provided by [OpenSubtitles.com](opensubtitles.com).
+  This is a .Net Core client library implementation for the [v1 REST API](https://www.opensubtitles.com/docs/api/html/index.htm) provided by [OpenSubtitles.com](https://opensubtitles.com).
 
 * SubtitleDownloader\
-  A .Net Core console application which uses the `OpenSubtitlesLibrary` to provide a CLI for downloading subtitles from [OpenSubtitles.com](opensubtitles.com).
+  A .Net Core console application which uses the `OpenSubtitlesLibrary` to provide a CLI for downloading subtitles from [OpenSubtitles.com](https://opensubtitles.com).
 
 ## 1. Open Subtitles library
 
@@ -91,7 +91,7 @@ Note that the password will be stored in plain text.
 
 It uses the following order for prioritization:
 
-1. The movie has a hash match on [OpenSubtitles.com](opensubtitles.com)
+1. The movie has a hash match on [OpenSubtitles.com](https://opensubtitles.com)
 2. The name of the movie has a close match to the name of the subtitles file.
 3. The subtitles are from a trusted source.
 4. The subtitles are not from hearing impaired. (Sorry! Perhaps this rule should become optional.)
