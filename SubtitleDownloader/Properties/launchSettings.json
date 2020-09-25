@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "SubtitleDownloader": {
+      "commandName": "Project",
+      "commandLineArgs": ""
+    }
+  }
+}

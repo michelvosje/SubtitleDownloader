@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30204.135
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SubtitleDownloader", "SubtitleDownloader\SubtitleDownloader.csproj", "{BAB04E07-D993-44BB-8BBC-970E3AD23208}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenSubtitlesLibrary", "OSDBLibrary\OpenSubtitlesLibrary.csproj", "{85C151F7-B70B-4411-B9BE-2FD63C28D2F4}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{BAB04E07-D993-44BB-8BBC-970E3AD23208}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BAB04E07-D993-44BB-8BBC-970E3AD23208}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BAB04E07-D993-44BB-8BBC-970E3AD23208}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BAB04E07-D993-44BB-8BBC-970E3AD23208}.Release|Any CPU.Build.0 = Release|Any CPU
+		{85C151F7-B70B-4411-B9BE-2FD63C28D2F4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{85C151F7-B70B-4411-B9BE-2FD63C28D2F4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{85C151F7-B70B-4411-B9BE-2FD63C28D2F4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{85C151F7-B70B-4411-B9BE-2FD63C28D2F4}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {F3900F08-2F72-4B5B-AFE1-11C8D37F3C60}
+	EndGlobalSection
+EndGlobal
