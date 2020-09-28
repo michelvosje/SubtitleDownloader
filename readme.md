@@ -1,29 +1,8 @@
 # Subtitle Downloader
 
-This repository contains the following projects:
-
-* OpenSubtitlesLibrary\
-  This is a .Net Core client library implementation for the [v1 REST API](https://www.opensubtitles.com/docs/api/html/index.htm) provided by [OpenSubtitles.com](https://opensubtitles.com).
-
-* SubtitleDownloader\
-  A .Net Core console application which uses the `OpenSubtitlesLibrary` to provide a CLI for downloading subtitles from [OpenSubtitles.com](https://opensubtitles.com).
-
-## 1. Open Subtitles library
-
-### 1.1 Supported Open Subtitles v1 API features
-
-The following functionality of the `OpenSubtitlesLibrary` is supported:
-
-* [Authentication](https://www.opensubtitles.com/docs/api/html/index.htm#create-session-and-token)
-* [Download subtitle file](https://www.opensubtitles.com/docs/api/html/index.htm#download-subtitle-file)
-* [Find subtitles for a video file](https://www.opensubtitles.com/docs/api/html/index.htm#find-subtitles-for-a-video-file).
-* [Get user data](https://www.opensubtitles.com/docs/api/html/index.htm#get-user-data)
-
-### 1.2 Notes
-
-On request I'll try to make the library available in a separate repository and make the library available as a NuGet package.
-
 ## 2. Subtitle Downloader CLI app
+
+.Net Core console application which uses [.Net Standard Open Subtitles client library](https://github.com/michelvosje/DotNet-Standard-OpenSubtitles) to provide a CLI for downloading subtitles from [OpenSubtitles.com](https://opensubtitles.com).
 
 ### 2.1 CLI commands
 
