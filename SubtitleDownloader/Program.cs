@@ -1,12 +1,11 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using OpenSubtitles;
+using OpenSubtitles.Extensions;
 using SubtitleDownloader.Configuration;
 using SubtitleDownloader.Services.Interfaces;
 using SubtitleDownloader.Utility;
 using System;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace SubtitleDownloader

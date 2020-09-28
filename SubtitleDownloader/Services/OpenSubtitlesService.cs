@@ -1,5 +1,4 @@
-﻿using F23.StringSimilarity;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using OpenSubtitles.Enums;
@@ -12,7 +11,6 @@ using SubtitleDownloader.Extensions;
 using SubtitleDownloader.Services.Interfaces;
 using SubtitleDownloader.Utility;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
