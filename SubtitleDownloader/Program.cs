@@ -18,30 +18,46 @@ namespace SubtitleDownloader
 
             if (!parameters.PrintHelp)
             {
-                var configuration = new ConfigurationBuilder()
-                    .AddJsonFile("appsettings.json", true)
-                    .AddJsonFile(SubtitleDownloaderSettingsLocator.GetUserSettingsFileName(), true)
-                    .Build();
+                var configuration = GetConfiguration();
+                var services = GetServices(parameters, configuration);
 
-                var serviceProvider = new ServiceCollection()
-                    .Configure<SubtitleDownloaderSettings>(configuration)
-                    .AddLogging(config => {
-                        config.ClearProviders();
-                        config.AddConsole();
-                        config.AddConfiguration(configuration.GetSection("Logging"));
-                    })
-                    .AddOpenSubtitlesApiServices()
-                    .AddSubtitleDownloaderServices()
-                    .AddSingleton(parameters)
-                    .BuildServiceProvider();
-
-                await serviceProvider.GetService<IOpenSubtitlesService>()
-                    .RunAsync(args);
+                using (ServiceProvider serviceProvider = services.BuildServiceProvider())
+                {
+                    await serviceProvider.GetService<IOpenSubtitlesService>()
+                        .RunAsync(args);
+                }
             }
             else
             {
                 PrintHelp();
             }
+        }
+
+        private static IConfiguration GetConfiguration()
+        {
+            var configurationBuilder = new ConfigurationBuilder()
+                .AddJsonFile("appsettings.json", false)
+                .AddJsonFile(SubtitleDownloaderSettingsLocator.GetUserSettingsFileName(), true);
+
+            var environment = Environment.GetEnvironmentVariable("Environment");
+            if (environment != null)
+                configurationBuilder.AddJsonFile($"appsettings.{environment}.json", true);
+
+            return configurationBuilder.Build();
+        }
+
+        private static IServiceCollection GetServices(ProgramParameters parameters, IConfiguration configuration)
+        {
+            return new ServiceCollection()
+                .Configure<SubtitleDownloaderSettings>(configuration)
+                .AddLogging(config => {
+                    config.ClearProviders();
+                    config.AddConsole();
+                    config.AddConfiguration(configuration.GetSection("Logging"));
+                })
+                .AddOpenSubtitlesApiServices()
+                .AddSubtitleDownloaderServices()
+                .AddSingleton(parameters);
         }
 
         public static ProgramParameters ReadParameters(string[] args)

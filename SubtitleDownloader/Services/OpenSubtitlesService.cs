@@ -21,7 +21,7 @@ namespace SubtitleDownloader.Services
 {
     public class OpenSubtitlesService : IOpenSubtitlesService
     {
-        private readonly ILogger<Program> logger;
+        private readonly ILogger<OpenSubtitlesService> logger;
         private readonly ProgramParameters programParameters;
         private readonly IOpenSubtitlesApi openSubtitlesApi;
         private readonly WebClient webClient;
@@ -29,7 +29,7 @@ namespace SubtitleDownloader.Services
         public SubtitleDownloaderSettings Settings { get; private set; }
 
         public OpenSubtitlesService(
-            ILogger<Program> logger,
+            ILogger<OpenSubtitlesService> logger,
             ProgramParameters programParameters,
             IOptions<SubtitleDownloaderSettings> options,
             IOpenSubtitlesApi openSubtitlesApi,
@@ -58,40 +58,57 @@ namespace SubtitleDownloader.Services
             else if (programParameters.ListSubtitles)
                 await ListMovieSubtitlesAsync(programParameters.MovieFileName);
             else if (programParameters.ShowStatus)
-                await ShowStatusAsync();
+                await ShowUserStatusAsync();
         }
 
         private async Task ConfigureUserAsync()
         {
-            Settings.OpenSubtitles = new SubtitleDownloaderSettings.OpenSubtitlesSettings();
-
-            Console.Write("Configure Open Subtitles username: ");
-            Settings.OpenSubtitles.Username = Console.ReadLine();
-
-            if (string.IsNullOrEmpty(Settings.OpenSubtitles.Username))
+            try
             {
-                Console.WriteLine("Invalid username.");
-                return;
+                Settings.OpenSubtitles = new SubtitleDownloaderSettings.OpenSubtitlesSettings();
+
+                Console.Write("Configure Open Subtitles username: ");
+                Settings.OpenSubtitles.Username = Console.ReadLine();
+
+                if (string.IsNullOrEmpty(Settings.OpenSubtitles.Username))
+                {
+                    Console.WriteLine("Invalid username.");
+                    return;
+                }
+
+                Console.WriteLine("Configure Open Subtitles password:");
+                Settings.OpenSubtitles.Password = GetUserPassword().ToString();
+
+                if (string.IsNullOrEmpty(Settings.OpenSubtitles.Password))
+                {
+                    Console.WriteLine("Invalid password.");
+                    return;
+                }
+
+                await SaveUserSettingsAsync(Settings);
             }
-
-            Console.WriteLine("Configure Open Subtitles password:");
-            Settings.OpenSubtitles.Password = GetUserPassword().ToString();
-
-            if (string.IsNullOrEmpty(Settings.OpenSubtitles.Password))
+            catch (Exception ex)
             {
-                Console.WriteLine("Invalid password.");
-                return;
+                Console.WriteLine("Failed to configure user credentials.");
+                logger.LogError(ex, "Failed to configure user credentials.");
             }
-
-            await WriteUserSettingsAsync(Settings);
         }
 
         private async Task ConfigureLanguageFilterAsync()
         {
-            Console.Write("Configure Open Subtitles language filter (comma separated): ");
-            Settings.OpenSubtitles.LanguageFilter = Console.ReadLine();
+            try
+            {
+                Console.Write("Configure Open Subtitles language filter (comma separated): ");
+                Settings.OpenSubtitles.LanguageFilter = Console.ReadLine();
 
-            await WriteUserSettingsAsync(Settings);
+                await SaveUserSettingsAsync(Settings);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Failed to configure language filter.");
+                logger.LogError(ex, "Failed to configure language filter.");
+                throw;
+            }
         }
 
         private async Task DownloadMovieSubtitlesAsync(string movieFileName)
@@ -117,6 +134,7 @@ namespace SubtitleDownloader.Services
             }
             catch (OpenSubtitlesException ex)
             {
+                Console.WriteLine("Failed to download subtitles.");
                 logger.LogError(ex, $"Failed to download subtitles for movie: {movieFileName}");
                 throw;
             }
@@ -144,6 +162,7 @@ namespace SubtitleDownloader.Services
             }
             catch (OpenSubtitlesException ex)
             {
+                Console.WriteLine($"Failed to download subtitles with Id:{subltitlesId}.");
                 logger.LogError(ex, $"Failed to download subtitles for movie:{movieFileName} with Id:{subltitlesId}");
                 throw;
             }
@@ -216,20 +235,21 @@ namespace SubtitleDownloader.Services
             }
             catch (OpenSubtitlesException ex)
             {
+                Console.WriteLine("Failed to list available subtitles.");
                 logger.LogError(ex, $"Failed to list available subtitles for movie: {movieFileName}");
                 throw;
             }
         }
 
         /// <summary>
-        /// Prints the Open Subtitles user status.
+        /// Prints the user status.
         /// </summary>
         /// <returns>Task which print the user status.</returns>
-        private async Task ShowStatusAsync()
+        private async Task ShowUserStatusAsync()
         {
             try
             {
-                var userInfo = await openSubtitlesApi.GetUserAsync();
+                var userInfo = await GetOpenSubtitlesUserInfo();
 
                 Console.WriteLine("Open Subtitles user status:");
                 Console.WriteLine($" - Remaining downloads today: {userInfo.Data.RemainingDownloads}/{userInfo.Data.AllowedDownloads}");
@@ -241,6 +261,10 @@ namespace SubtitleDownloader.Services
             }
         }
 
+        /// <summary>
+        /// Retrieves the Open Subtitles user info.
+        /// </summary>
+        /// <returns>Open Subtitles user info.</returns>
         private async Task<InfoUserResponse> GetOpenSubtitlesUserInfo()
         {
             await LoginOpenSubtitles();
@@ -280,28 +304,6 @@ namespace SubtitleDownloader.Services
                 Password = Settings.OpenSubtitles.Password
             });
         }
-
-        /*
-        /// <summary>
-        /// Filters and orders a returned overview of subtitles.
-        /// </summary>
-        /// <param name="models">The overview of subtitles.</param>
-        /// <returns>Filtered and ordered collection of subtitles.</returns>
-        private List<FindResponse.DataModel> FilterFoundSubtitles(string movieName, List<FindResponse.DataModel> models)
-        {
-            var levenshtein = new Levenshtein();
-
-            return models
-                .Where(s => s.Attributes.Files.Count == 1)
-                .OrderByDescending(s => s.Attributes.MovieHashMatch)
-                .ThenBy(s => levenshtein.Distance(s.Attributes.Release, movieName))
-                .ThenByDescending(s => s.Attributes.FromTrusted)
-                .ThenBy(s => s.Attributes.HearingImpaired)
-                .ThenBy(s => s.Attributes.AiTranslated)
-                .ThenBy(s => s.Attributes.MachineTranslated.GetValueOrDefault())
-                .ToList();
-        }
-        */
 
         /// <summary>
         /// Downloads the file from <paramref name="address"/> and saves it to <paramref name="fileName"/>.
@@ -350,25 +352,34 @@ namespace SubtitleDownloader.Services
         }
 
         /// <summary>
-        /// Delete the user settings directory.
+        /// Delete the user settings.
         /// </summary>
-        /// <returns>Task which deletes the user settings directory.</returns>
+        /// <returns>Task which deletes the user settings.</returns>
         private async Task DeleteUserSettingsAsync()
         {
-            var settingsDirectory = SubtitleDownloaderSettingsLocator.GetUserSettingsDirectory();
+            try
+            {
+                var settingsDirectory = SubtitleDownloaderSettingsLocator.GetUserSettingsDirectory();
 
-            if (Directory.Exists(settingsDirectory))
-                Directory.Delete(settingsDirectory, true);
+                if (Directory.Exists(settingsDirectory))
+                    Directory.Delete(settingsDirectory, true);
 
-            await Task.CompletedTask;
+                await Task.CompletedTask;
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Failed to delete user settings.");
+                Console.WriteLine("Failed to delete user settings.");
+                throw;
+            }
         }
 
         /// <summary>
-        /// Write user setting to settings file inside user settings directory.
+        /// Save user settings.
         /// </summary>
         /// <param name="settings"></param>
-        /// <returns>Task which writes the user settings.</returns>
-        private async Task WriteUserSettingsAsync(SubtitleDownloaderSettings settings)
+        /// <returns>Task which saves the user settings.</returns>
+        private async Task SaveUserSettingsAsync(SubtitleDownloaderSettings settings)
         {
             var settingsJson = JsonConvert.SerializeObject(settings, Formatting.Indented);
             var settingsDirectory = SubtitleDownloaderSettingsLocator.GetUserSettingsDirectory();
